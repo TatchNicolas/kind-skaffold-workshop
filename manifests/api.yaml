@@ -1,0 +1,39 @@
+apiVersion: apis/v1
+kind: Deployment
+metadata:
+  name: sample-api
+  labels:
+    api: sample-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      api: sample-api
+  template:
+    metadata:
+      labels:
+        api: sample-api
+    spec:
+      containers:
+      - name: api
+        image: tatchimage
+        env:
+        - name: APP_MONGO_URL
+          value: mongodb://root:example@mongo-svc:27017/loadtest?authSource=admin
+        - name: APP_MONGO_USER_COL  
+          value: users
+        command: ["uvicorn", "sample:api", "--host", "0.0.0.0", "--port", "8000"]
+        ports:
+        - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-api-svc
+spec:
+  selector:
+    api: sample-api
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000

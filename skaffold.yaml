@@ -1,0 +1,20 @@
+apiVersion: skaffold/v2beta21
+kind: Config
+metadata:
+  name: kind-skaffold-workshop
+build:
+  artifacts:
+  - image: tatchimage
+    docker:
+      dockerfile: Dockerfile
+deploy:
+  kubeContext: kind-skaffold-workshop
+  kubectl:
+    manifests:
+    - manifests/api.yaml
+    - manifests/front.yaml
+portForward:
+- resourceType: service
+  resourceName: sample-app-svc
+  port: 8000
+  localPort: 8000

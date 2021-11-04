@@ -1,0 +1,39 @@
+frontVersion: fronts/v1
+kind: Deployment
+metadata:
+  name: sample-front
+  labels:
+    front: sample-front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      front: sample-front
+  template:
+    metadata:
+      labels:
+        front: sample-front
+    spec:
+      containers:
+      - name: front
+        image: tatchimage
+        env:
+        - name: APP_MONGO_URL
+          value: mongodb://root:example@mongo-svc:27017/loadtest?authSource=admin
+        - name: APP_MONGO_USER_COL  
+          value: users
+        command: ["uvicorn", "sample:front", "--host", "0.0.0.0", "--port", "8000"]
+        ports:
+        - containerPort: 8000
+---
+frontVersion: v1
+kind: Service
+metadata:
+  name: sample-front-svc
+spec:
+  selector:
+    front: sample-front
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
